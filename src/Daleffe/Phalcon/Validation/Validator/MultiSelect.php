@@ -2,33 +2,33 @@
 
 namespace Daleffe\Phalcon\Validation\Validator;
 
-use Phalcon\Validation\Validator;
-use Phalcon\Validation\Message;
-use Phalcon\Validation\Exception as ValidationException;
+use Phalcon\Messages\Message;
 use Phalcon\Validation;
+use Phalcon\Validation\AbstractValidator;
 
-class MultiSelect extends Validator
+class MultiSelect extends AbstractValidator
 {
-    /**
-     * Class constructor.
-     *
-     * @param  array $options
-     * @throws ValidationException
-     */
-    public function __construct(array $options = array())
-    {
-        parent::__construct($options);
+  /**
+   * Executes the validation
+   *
+   * @param Validation $validation
+   * @param mixed      $field
+   *
+   * @return boolean
+   */
+  public function validate(Validation $validation, $field): bool
+  {
+    $value = $validation->getValue(strpos($field,'[]') ? str_replace('[]','',$field) : $field);
+
+    if (empty($value)) {
+      $message = $this->hasOption('message') === false ? "Select at least one item" : $this->getOption('message');
+
+      $validation->appendMessage(new Message($message, $field, 'MultiSelect'));
+
+      return false;
     }
 
-    /**
-     * Executes the multiple select validation
-     *
-     * @param \Phalcon\Validation $validator
-     * @param string $attribute
-     * @return boolean
-     */
-    public function validate(Validation $validator, $attribute)
-    {
-    }
+    return true;
+  }
 }
 ?>
